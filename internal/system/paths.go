@@ -3,8 +3,6 @@ package system
 import (
 	"os"
 	"strings"
-
-	"github.com/spf13/cobra"
 )
 
 var (
@@ -12,29 +10,45 @@ var (
 	workDir = os.Getwd
 )
 
-func AsAbsolutePath(path string) string {
+func AsAbsolutePath(path string) (string, error) {
 	switch {
 	case strings.HasPrefix(path, "~"):
 		return replaceTildeWithHome(path)
 	case !strings.HasPrefix(path, "/"):
 		return createPathFromWorkingDirectory(path)
 	default:
-		return path
+		return path, nil
 	}
 }
 
-func createPathFromWorkingDirectory(path string) string {
+func createPathFromWorkingDirectory(path string) (string, error) {
 	workingDirectory, err := workDir()
-	cobra.CheckErr(err)
+	if err != nil {
+		return "", err
+	}
 
-	return workingDirectory + "/" + path
+	return workingDirectory + "/" + path, nil
 }
 
-func replaceTildeWithHome(path string) string {
+func replaceTildeWithHome(path string) (string, error) {
 	home, err := homeDir()
-	cobra.CheckErr(err)
+	if err != nil {
+		return "", err
+	}
 
 	path = strings.Replace(path, "~", home, 1)
 
-	return path
+	return path, nil
+}
+
+func DoesFolderExist(path string) (bool, error) {
+	_, err := os.Stat(path)
+	switch {
+	case err == nil:
+		return true, nil
+	case os.IsNotExist(err):
+		return false, nil
+	default:
+		return false, err
+	}
 }

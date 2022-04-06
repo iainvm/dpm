@@ -24,7 +24,10 @@ func TestCreatePathFromWorkingDirectory(t *testing.T) {
 	}
 
 	for path, expected := range testCases {
-		result := AsAbsolutePath(path)
+		result, err := AsAbsolutePath(path)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		if result != expected {
 			t.Errorf("Expected %s, but got %s", expected, result)
