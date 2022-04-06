@@ -33,6 +33,13 @@ func Execute() {
 	}
 }
 
+func verbosePrintf(location *os.File, message string, args ...interface{}) {
+	verbose, _ := rootCmd.PersistentFlags().GetBool("verbose")
+	if verbose {
+		fmt.Fprintf(location, message, args...)
+	}
+}
+
 func init() {
 	cobra.OnInitialize(initConfig)
 
@@ -41,15 +48,15 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.dev.yaml)")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Log more details")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	// Viper Config
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
-	viper.SetDefault("devRootPath", home+"/dev")
+	viper.SetDefault("projects_home", home+"/dev")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -67,11 +74,11 @@ func initConfig() {
 		viper.SetConfigName(".dev")
 		viper.SetConfigType("yaml")
 	}
-
+	viper.SetEnvPrefix("dev")
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		verbosePrintf(os.Stderr, "Using config file: %v\n", viper.ConfigFileUsed())
 	}
 }

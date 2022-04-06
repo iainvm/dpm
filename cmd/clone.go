@@ -6,10 +6,13 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
 	"github.com/iainvm/dev/internal/git"
+	"github.com/iainvm/dev/internal/system"
 )
 
 // cloneCmd represents the clone command
@@ -25,11 +28,11 @@ var cloneCmd = &cobra.Command{
 		}
 		return nil
 	},
-	Long: `Will clone a git project into your DEV_ROOT
+	Long: `Will clone a git project into your projects home
 
 	e.g. git@github.com:iainvm/dev.git
 	will clone to
-	$DEV_ROOT/github.com/iainvm/dev`,
+	$DEV_PROJECTS_HOME/github.com/iainvm/dev`,
 	Run: func(cmd *cobra.Command, args []string) {
 		exec(args)
 	},
@@ -40,4 +43,14 @@ func init() {
 }
 
 func exec(args []string) {
+	projectPath, err := git.GetProjectPath(args[0])
+	cobra.CheckErr(err)
+
+	verbosePrintf(os.Stdout, "Project path: %s\n", projectPath)
+
+	projectExists, err := system.DoesFolderExist(projectPath)
+	cobra.CheckErr(err)
+	if projectExists {
+		fmt.Fprintf(os.Stdout, "Project already exists at: %s", projectPath)
+	}
 }
