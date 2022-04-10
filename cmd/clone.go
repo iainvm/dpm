@@ -43,12 +43,16 @@ func init() {
 }
 
 func exec(args []string) {
+
+	// Process args
 	url := args[0]
+
+	// Get additional info
 	projectPath, err := git.GetProjectPath(url)
 	cobra.CheckErr(err)
-
 	verbosePrintf(os.Stdout, "Project path: %s\n", projectPath)
 
+	// Validate if project exists
 	projectExists, err := system.DoesFolderExist(projectPath)
 	cobra.CheckErr(err)
 	if projectExists {
@@ -56,6 +60,7 @@ func exec(args []string) {
 		os.Exit(0)
 	}
 
+	// Clone project if it doesn't exist
 	_, err = git.Clone(url, projectPath)
 	cobra.CheckErr(err)
 }
