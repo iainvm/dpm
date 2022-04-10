@@ -43,7 +43,8 @@ func init() {
 }
 
 func exec(args []string) {
-	projectPath, err := git.GetProjectPath(args[0])
+	url := args[0]
+	projectPath, err := git.GetProjectPath(url)
 	cobra.CheckErr(err)
 
 	verbosePrintf(os.Stdout, "Project path: %s\n", projectPath)
@@ -52,5 +53,9 @@ func exec(args []string) {
 	cobra.CheckErr(err)
 	if projectExists {
 		fmt.Fprintf(os.Stdout, "Project already exists at: %s", projectPath)
+		os.Exit(0)
 	}
+
+	_, err = git.Clone(url, projectPath)
+	cobra.CheckErr(err)
 }
