@@ -56,7 +56,7 @@ func init() {
 	// Viper Config
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
-	viper.SetDefault("projects_home", home+"/dpm")
+	viper.SetDefault("projects_home", home+"/dev")
 }
 
 // initConfig reads in config file and ENV variables if set.

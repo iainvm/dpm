@@ -2,6 +2,7 @@ package system
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -51,4 +52,15 @@ func DoesFolderExist(path string) (bool, error) {
 	default:
 		return false, err
 	}
+}
+
+func GetDirectoriesInPath(path string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			files = append(files, path)
+		}
+		return nil
+	})
+	return files, err
 }

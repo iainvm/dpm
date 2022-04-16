@@ -35,7 +35,7 @@ var cloneCmd = &cobra.Command{
 	will clone to
 	$DPM_PROJECTS_HOME/github.com/iainvm/dpm`,
 	Run: func(cmd *cobra.Command, args []string) {
-		exec(args)
+		clone(args)
 	},
 }
 
@@ -43,7 +43,7 @@ func init() {
 	rootCmd.AddCommand(cloneCmd)
 }
 
-func exec(args []string) {
+func clone(args []string) {
 	// Process args
 	url := args[0]
 	projects_home := viper.GetString(PROJECTS_HOME)

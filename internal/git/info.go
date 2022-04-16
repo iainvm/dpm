@@ -3,6 +3,8 @@ package git
 import (
 	"regexp"
 	"strings"
+
+	"github.com/iainvm/dpm/internal/system"
 )
 
 // IsValidGitURL validates the given url against a RegEx to determine it's of an accepted format
@@ -11,6 +13,10 @@ func IsValidGitURL(url string) bool {
 	matched, _ := regexp.MatchString(git_url_regex, url)
 
 	return matched
+}
+
+func IsGitProjectPath(path string) (bool, error) {
+	return system.DoesFolderExist(path + "/.git")
 }
 
 // TranslateToHTTP converts a given git url into a http version of it, for easier
@@ -44,4 +50,20 @@ func GetProjectPath(url string) string {
 	}
 
 	return project_path
+}
+
+func GetProjectPathsInPath(path string) ([]string, error) {
+	var gitProjects []string
+
+	folders, err := system.GetDirectoriesInPath(path)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, folder := range folders {
+		if strings.HasSuffix(folder, ".git") {
+			gitProjects = append(gitProjects, strings.TrimSuffix(folder, "/.git"))
+		}
+	}
+	return gitProjects, nil
 }
