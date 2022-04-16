@@ -4,7 +4,7 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 */
 package main
 
-import "github.com/iainvm/dev/cmd"
+import "github.com/iainvm/dpm/cmd"
 
 func main() {
 	cmd.Execute()

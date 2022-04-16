@@ -1,4 +1,4 @@
-module github.com/iainvm/dev
+module github.com/iainvm/dpm
 
 go 1.17
 

@@ -6,8 +6,8 @@ import (
 
 func TestIsValidGitURL(t *testing.T) {
 	testCases := map[string]bool{
-		"git@github.com:iainvm/dev.git":     true,
-		"https://github.com/iainvm/dev.git": true,
+		"git@github.com:iainvm/dpm.git":     true,
+		"https://github.com/iainvm/dpm.git": true,
 		"google.com":                        false,
 	}
 
@@ -22,8 +22,8 @@ func TestIsValidGitURL(t *testing.T) {
 
 func TestTranslateToHTTP(t *testing.T) {
 	testCases := map[string]string{
-		"git@github.com:iainvm/dev.git":     "https://github.com/iainvm/dev.git",
-		"https://github.com/iainvm/dev.git": "https://github.com/iainvm/dev.git",
+		"git@github.com:iainvm/dpm.git":     "https://github.com/iainvm/dpm.git",
+		"https://github.com/iainvm/dpm.git": "https://github.com/iainvm/dpm.git",
 	}
 
 	var result string
@@ -38,8 +38,8 @@ func TestTranslateToHTTP(t *testing.T) {
 
 func TestGetProjectPath(t *testing.T) {
 	testCases := map[string]string{
-		"git@github.com:iainvm/dev.git":     "github.com/iainvm/dev",
-		"https://github.com/iainvm/dev.git": "github.com/iainvm/dev",
+		"git@github.com:iainvm/dpm.git":     "github.com/iainvm/dpm",
+		"https://github.com/iainvm/dpm.git": "github.com/iainvm/dpm",
 	}
 
 	var result string

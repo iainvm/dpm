@@ -16,7 +16,7 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "dev",
+	Use:   "dpm",
 	Short: "A tool to manage development projects",
 	Long:  `A tool to manage development projects`,
 	// Uncomment the following line if your bare application
@@ -47,7 +47,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.dev.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.dpm.yaml)")
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Log more details")
 
 	// Cobra also supports local flags, which will only run
@@ -56,7 +56,7 @@ func init() {
 	// Viper Config
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
-	viper.SetDefault("projects_home", home+"/dev")
+	viper.SetDefault("projects_home", home+"/dpm")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -69,12 +69,12 @@ func initConfig() {
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".dev" (without extension).
+		// Search config in home directory with name ".dpm" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".dev")
+		viper.SetConfigName(".dpm")
 		viper.SetConfigType("yaml")
 	}
-	viper.SetEnvPrefix("dev")
+	viper.SetEnvPrefix("dpm")
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.

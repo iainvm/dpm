@@ -12,14 +12,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/iainvm/dev/internal/git"
-	"github.com/iainvm/dev/internal/system"
+	"github.com/iainvm/dpm/internal/git"
+	"github.com/iainvm/dpm/internal/system"
 )
 
 // cloneCmd represents the clone command
 var cloneCmd = &cobra.Command{
 	Use:   "clone",
-	Short: "Clone a git project into your DEV_ROOT",
+	Short: "Clone a git project into your DPM_ROOT",
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return errors.New("only accepts 1 argument")
@@ -31,9 +31,9 @@ var cloneCmd = &cobra.Command{
 	},
 	Long: `Will clone a git project into your projects home
 
-	e.g. git@github.com:iainvm/dev.git
+	e.g. git@github.com:iainvm/dpm.git
 	will clone to
-	$DEV_PROJECTS_HOME/github.com/iainvm/dev`,
+	$DPM_PROJECTS_HOME/github.com/iainvm/dpm`,
 	Run: func(cmd *cobra.Command, args []string) {
 		exec(args)
 	},
