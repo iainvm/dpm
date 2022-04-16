@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/iainvm/dev/internal/git"
 	"github.com/iainvm/dev/internal/system"
@@ -43,24 +44,25 @@ func init() {
 }
 
 func exec(args []string) {
-
 	// Process args
 	url := args[0]
+	projects_home := viper.GetString(PROJECTS_HOME)
 
 	// Get additional info
-	projectPath, err := git.GetProjectPath(url)
+	var projectPath string = git.GetProjectPath(url)
+	absoluteProjectPath, err := system.AsAbsolutePath(projects_home + "/" + projectPath)
 	cobra.CheckErr(err)
-	verbosePrintf(os.Stdout, "Project path: %s\n", projectPath)
+	verbosePrintf(os.Stdout, "Project path: %s\n", absoluteProjectPath)
 
 	// Validate if project exists
-	projectExists, err := system.DoesFolderExist(projectPath)
+	projectExists, err := system.DoesFolderExist(absoluteProjectPath)
 	cobra.CheckErr(err)
 	if projectExists {
-		fmt.Fprintf(os.Stdout, "Project already exists at: %s", projectPath)
+		fmt.Fprintf(os.Stdout, "Project already exists at: %s", absoluteProjectPath)
 		os.Exit(0)
 	}
 
 	// Clone project if it doesn't exist
-	_, err = git.Clone(url, projectPath)
+	_, err = git.Clone(url, absoluteProjectPath)
 	cobra.CheckErr(err)
 }

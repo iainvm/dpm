@@ -2,8 +2,6 @@ package git
 
 import (
 	"testing"
-
-	"github.com/spf13/viper"
 )
 
 func TestIsValidGitURL(t *testing.T) {
@@ -40,19 +38,13 @@ func TestTranslateToHTTP(t *testing.T) {
 
 func TestGetProjectPath(t *testing.T) {
 	testCases := map[string]string{
-		"git@github.com:iainvm/dev.git":     "/test_projects_home/github.com/iainvm/dev",
-		"https://github.com/iainvm/dev.git": "/test_projects_home/github.com/iainvm/dev",
+		"git@github.com:iainvm/dev.git":     "github.com/iainvm/dev",
+		"https://github.com/iainvm/dev.git": "github.com/iainvm/dev",
 	}
 
-	viper.Set("projects_home", "/test_projects_home")
-
 	var result string
-	var err error
 	for url, expected := range testCases {
-		result, err = GetProjectPath(url)
-		if err != nil {
-			t.Fail()
-		}
+		result = GetProjectPath(url)
 
 		if result != expected {
 			t.Errorf("Expected %s, but got %s", expected, result)

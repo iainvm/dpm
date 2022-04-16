@@ -3,10 +3,6 @@ package git
 import (
 	"regexp"
 	"strings"
-
-	"github.com/spf13/viper"
-
-	"github.com/iainvm/dev/internal/system"
 )
 
 // IsValidGitURL validates the given url against a RegEx to determine it's of an accepted format
@@ -36,9 +32,9 @@ func TranslateToHTTP(url string) string {
 }
 
 // GetProjectPath deconstructs the url given and determines the directory path it for the project
-// e.g. git@github.com:iainvm/dev.git     -> github.com/iainvm/dev
-//      https://github.com/iainvm/dev.git -> github.com/iainvm/dev
-func GetProjectPath(url string) (string, error) {
+// e.g. git@github.com:iainvm/dev.git     -> <projects_home>/github.com/iainvm/dev
+//      https://github.com/iainvm/dev.git -> <projects_home>/github.com/iainvm/dev
+func GetProjectPath(url string) string {
 	var project_path string
 	project_path = TranslateToHTTP(url)
 	project_path = strings.Replace(project_path, "https://", "", 1)
@@ -47,9 +43,5 @@ func GetProjectPath(url string) (string, error) {
 		project_path = strings.Replace(project_path, ".git", "", 1)
 	}
 
-	var devDir string = viper.GetString("projects_home")
-
-	var full_path string = devDir + "/" + project_path
-
-	return system.AsAbsolutePath(full_path)
+	return project_path
 }
