@@ -14,8 +14,6 @@ import (
 
 var cfgFile string
 
-const PROJECTS_HOME string = "projects_home"
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "dev",
