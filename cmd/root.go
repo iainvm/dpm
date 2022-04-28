@@ -1,7 +1,3 @@
-/*
-Copyright © 2022 Iain Majer iainvm@outlook.com
-
-*/
 package cmd
 
 import (
