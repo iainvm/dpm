@@ -14,7 +14,7 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all projects in projects home",
-	Long: `List all projects that have been cloned into the projects home folder	`,
+	Long:  `Searches the projects home directory for any git projects, returns the path of found git projects`,
 	Run: func(cmd *cobra.Command, args []string) {
 		list(args)
 	},
@@ -22,7 +22,7 @@ var listCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-	rootCmd.PersistentFlags().BoolP("name", "n", false, "Log more details")
+	rootCmd.PersistentFlags().BoolP("name", "n", false, "Only return project names")
 }
 
 func list(args []string) {
