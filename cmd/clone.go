@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -25,11 +26,10 @@ var cloneCmd = &cobra.Command{
 		}
 		return nil
 	},
-	Long: `Will clone a git project into your projects home
+	Long: fmt.Sprintf(`Clone a git project into your projects home
 
-	e.g. git@github.com:iainvm/dpm.git
-	will clone to
-	$DPM_PROJECTS_HOME/github.com/iainvm/dpm`,
+	$ dpm clone git@github.com:iainvm/dpm.git
+	Clones the project into $%s_%s/github.com/iainvm/dpm`, CONFIG_ENV_PREFIX, strings.ToUpper(CONFIG_KEY_PROJECTS_HOME)),
 	Run: func(cmd *cobra.Command, args []string) {
 		clone(args)
 	},
@@ -37,14 +37,15 @@ var cloneCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(cloneCmd)
+	cloneCmd.PersistentFlags().BoolP("short", "s", false, "Short output, will only return the absolute path to the project.")
 }
 
 func clone(args []string) {
 	// Process args
 	url := args[0]
-	projects_home := viper.GetString(PROJECTS_HOME)
 
 	// Get additional info
+	projects_home := viper.GetString(CONFIG_KEY_PROJECTS_HOME)
 	var projectPath string = git.GetProjectPath(url)
 	absoluteProjectPath, err := system.AsAbsolutePath(projects_home + "/" + projectPath)
 	cobra.CheckErr(err)

@@ -22,11 +22,11 @@ var listCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-	rootCmd.PersistentFlags().BoolP("name", "n", false, "Only return project names")
+	listCmd.PersistentFlags().BoolP("name", "n", false, "Only return project names")
 }
 
 func list(args []string) {
-	var projects_home string = viper.GetString(PROJECTS_HOME)
+	projects_home := viper.GetString(CONFIG_KEY_PROJECTS_HOME)
 	nameOnly, err := rootCmd.PersistentFlags().GetBool("name")
 	cobra.CheckErr(err)
 

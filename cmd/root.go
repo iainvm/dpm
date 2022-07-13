@@ -50,9 +50,9 @@ func init() {
 	// when this action is called directly.
 
 	// Viper Config
-	home, err := os.UserHomeDir()
+	userHome, err := os.UserHomeDir()
 	cobra.CheckErr(err)
-	viper.SetDefault("projects_home", home+"/dev")
+	viper.SetDefault("projects_home", userHome+"/dev")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -62,15 +62,15 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		// Find home directory.
-		home, err := os.UserHomeDir()
+		userHome, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".dpm" (without extension).
-		viper.AddConfigPath(home)
+		// Search config in user's home directory with name ".dpm" (without extension).
+		viper.AddConfigPath(userHome)
 		viper.SetConfigName(".dpm")
 		viper.SetConfigType("yaml")
 	}
-	viper.SetEnvPrefix("dpm")
+	viper.SetEnvPrefix(CONFIG_ENV_PREFIX)
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
