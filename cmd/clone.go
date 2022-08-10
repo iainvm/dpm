@@ -36,8 +36,8 @@ var cloneCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(cloneCmd)
 	cloneCmd.PersistentFlags().BoolP("short", "s", false, "Short output, will only return the absolute path to the project.")
+	rootCmd.AddCommand(cloneCmd)
 }
 
 func clone(args []string) {

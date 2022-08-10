@@ -20,6 +20,8 @@ func TestCreatePathFromWorkingDirectory(t *testing.T) {
 	testCases := map[string]string{
 		"~/path/to/file":         "/home/dir/path/to/file",
 		"path/to/file":           "/work/dir/path/to/file",
+		"./path/to/file":         "/work/dir/path/to/file",
+		"../path/to/file":        "/work/path/to/file",
 		"/absolute/path/to/file": "/absolute/path/to/file",
 	}
 
