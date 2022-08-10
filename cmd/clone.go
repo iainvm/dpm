@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/iainvm/dpm/internal/config"
 	"github.com/iainvm/dpm/internal/git"
 	"github.com/iainvm/dpm/internal/system"
 )
@@ -29,7 +30,7 @@ var cloneCmd = &cobra.Command{
 	Long: fmt.Sprintf(`Clone a git project into your projects home
 
 	$ dpm clone git@github.com:iainvm/dpm.git
-	Clones the project into $%s_%s/github.com/iainvm/dpm`, CONFIG_ENV_PREFIX, strings.ToUpper(CONFIG_KEY_PROJECTS_HOME)),
+	Clones the project into $%s_%s/github.com/iainvm/dpm`, CONFIG_ENV_PREFIX, strings.ToUpper(config.KEY_PROJECTS_HOME)),
 	Run: func(cmd *cobra.Command, args []string) {
 		clone(args)
 	},
@@ -38,6 +39,7 @@ var cloneCmd = &cobra.Command{
 func init() {
 	cloneCmd.PersistentFlags().BoolP("short", "s", false, "Short output, will only return the absolute path to the project.")
 	rootCmd.AddCommand(cloneCmd)
+	viper.SetDefault(config.KEY_PRIVATE_KEY_LOCATION, "~/.ssh/id_ed25519")
 }
 
 func clone(args []string) {
@@ -45,21 +47,23 @@ func clone(args []string) {
 	url := args[0]
 
 	// Get additional info
-	projects_home := viper.GetString(CONFIG_KEY_PROJECTS_HOME)
-	var projectPath string = git.GetProjectPath(url)
-	absoluteProjectPath, err := system.AsAbsolutePath(projects_home + "/" + projectPath)
+	projects_home, err := config.GetProjectsHome()
 	cobra.CheckErr(err)
-	verbosePrintf(os.Stdout, "Project path: %s\n", absoluteProjectPath)
+	privateKeyLocation, err := config.GetPrivateKeyLocation()
+	cobra.CheckErr(err)
 
 	// Validate if project exists
+	var absoluteProjectPath string = projects_home + git.GetProjectPath(url)
+	verbosePrintf(os.Stdout, "Project path: %s\n", absoluteProjectPath)
 	projectExists, err := system.DoesFolderExist(absoluteProjectPath)
 	cobra.CheckErr(err)
 	if projectExists {
-		fmt.Fprintf(os.Stdout, "Project already exists at: %s", absoluteProjectPath)
+		fmt.Fprintf(os.Stdout, "Project already exists at: %s\n", absoluteProjectPath)
 		os.Exit(0)
 	}
 
 	// Clone project if it doesn't exist
-	_, err = git.Clone(url, absoluteProjectPath)
+	verbosePrintf(os.Stdout, "Cloning\n")
+	_, err = git.Clone(url, absoluteProjectPath, privateKeyLocation)
 	cobra.CheckErr(err)
 }

@@ -38,8 +38,8 @@ func TranslateToHTTP(url string) string {
 }
 
 // GetProjectPath deconstructs the url given and determines the directory path it for the project
-// e.g. git@github.com:iainvm/dpm.git     -> <projects_home>/github.com/iainvm/dpm
-//      https://github.com/iainvm/dpm.git -> <projects_home>/github.com/iainvm/dpm
+// e.g. git@github.com:iainvm/dpm.git     -> github.com/iainvm/dpm
+//      https://github.com/iainvm/dpm.git -> github.com/iainvm/dpm
 func GetProjectPath(url string) string {
 	var project_path string
 	project_path = TranslateToHTTP(url)

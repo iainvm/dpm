@@ -6,6 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/iainvm/dpm/internal/config"
 )
 
 var cfgFile string
@@ -50,9 +52,7 @@ func init() {
 	// when this action is called directly.
 
 	// Viper Config
-	userHome, err := os.UserHomeDir()
-	cobra.CheckErr(err)
-	viper.SetDefault("projects_home", userHome+"/dev")
+	viper.SetDefault(config.KEY_PROJECTS_HOME, "~/dev")
 }
 
 // initConfig reads in config file and ENV variables if set.

@@ -8,18 +8,13 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 )
 
-func Clone(url string, location string) (*git.Repository, error) {
-	userHome, err := os.UserHomeDir()
-	if err != nil {
-		return nil, err
-	}
-	privateKeyFile := fmt.Sprintf("%s/.ssh/id_ed25519", userHome)
-	_, err = os.Stat(privateKeyFile)
+func Clone(url string, location string, privateKeyLocation string) (*git.Repository, error) {
+	_, err := os.Stat(privateKeyLocation)
 	if err != nil {
 		return nil, err
 	}
 
-	publicKeys, err := ssh.NewPublicKeysFromFile("git", privateKeyFile, "")
+	publicKeys, err := ssh.NewPublicKeysFromFile("git", privateKeyLocation, "")
 	if err != nil {
 		return nil, err
 	}

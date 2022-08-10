@@ -6,10 +6,9 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
+	"github.com/iainvm/dpm/internal/config"
 	"github.com/iainvm/dpm/internal/git"
-	"github.com/iainvm/dpm/internal/system"
 )
 
 // listCmd represents the list command
@@ -26,10 +25,8 @@ func init() {
 }
 
 func list(cmd *cobra.Command, args []string) {
-	projects_home := viper.GetString(CONFIG_KEY_PROJECTS_HOME)
-	projects_home, err := system.AsAbsolutePath(projects_home)
+	projects_home, err := config.GetProjectsHome()
 	cobra.CheckErr(err)
-	verbosePrintf(os.Stdout, "Projects Home: %s\n", projects_home)
 
 	nameOnly, err := cmd.PersistentFlags().GetBool("name")
 	cobra.CheckErr(err)
