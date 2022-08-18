@@ -53,7 +53,7 @@ func clone(args []string) {
 	cobra.CheckErr(err)
 
 	// Validate if project exists
-	var absoluteProjectPath string = projects_home + git.GetProjectPath(url)
+	var absoluteProjectPath string = projects_home + "/" + git.GetProjectPath(url)
 	verbosePrintf(os.Stdout, "Project path: %s\n", absoluteProjectPath)
 	projectExists, err := system.DoesFolderExist(absoluteProjectPath)
 	cobra.CheckErr(err)
