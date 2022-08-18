@@ -39,7 +39,7 @@ var cloneCmd = &cobra.Command{
 func init() {
 	cloneCmd.PersistentFlags().BoolP("short", "s", false, "Short output, will only return the absolute path to the project.")
 	rootCmd.AddCommand(cloneCmd)
-	viper.SetDefault(config.KEY_PRIVATE_KEY_LOCATION, "~/.ssh/id_ed25519")
+	viper.SetDefault(config.KEY_PRIVATE_KEY_LOCATION, "~/.ssh/id_rsa")
 }
 
 func clone(args []string) {
