@@ -66,8 +66,8 @@ func initConfig() {
 		cobra.CheckErr(err)
 
 		// Search config in user's home directory with name ".dpm" (without extension).
-		viper.AddConfigPath(userHome)
-		viper.SetConfigName(".dpm")
+		viper.AddConfigPath(fmt.Sprintf("%s/.config/dpm", userHome))
+		viper.SetConfigName("config")
 		viper.SetConfigType("yaml")
 	}
 	viper.SetEnvPrefix(CONFIG_ENV_PREFIX)
