@@ -1,0 +1,13 @@
+version: "3"
+silent: true
+
+tasks:
+  test:
+    desc: Test the project
+    cmds:
+      - go test -cover ./...
+
+  build:
+    desc: Build the project
+    cmds:
+      - nix build
