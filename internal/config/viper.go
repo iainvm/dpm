@@ -1,24 +1,46 @@
 package config
 
 import (
-	"github.com/spf13/viper"
+	"fmt"
+	"log/slog"
+	"os"
 
-	"github.com/iainvm/dpm/internal/system"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-func GetProjectsHome() (string, error) {
-	path, err := getAsAbsolutePath(KEY_PROJECTS_HOME)
-	return path, err
-}
+// Load loads the configuration from the default file or the given configFile path
+func Load(prefix string, configPath string) error {
+	slog.Debug(
+		"Loading config file",
+		slog.String("file", viper.ConfigFileUsed()),
+	)
 
-func GetPrivateKeyLocation() (string, error) {
-	path, err := getAsAbsolutePath(KEY_PRIVATE_KEY_LOCATION)
-	return path, err
-}
+	if configPath != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(configPath)
+	} else {
+		// Find home directory.
+		userHome, err := os.UserHomeDir()
+		cobra.CheckErr(err)
 
-func getAsAbsolutePath(key string) (string, error) {
-	path := viper.GetString(key)
-	path, err := system.AsAbsolutePath(path)
+		// Search config in user's home directory with name ".dpm" (without extension).
+		viper.AddConfigPath(fmt.Sprintf("%s/.config/dpm", userHome))
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
+	}
+	viper.SetEnvPrefix(prefix)
+	viper.AutomaticEnv()
 
-	return path, err
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err != nil {
+		slog.Error(
+			"Loaded config file",
+			slog.String("file", viper.ConfigFileUsed()),
+			slog.Any("error", err),
+		)
+		return err
+	}
+
+	return nil
 }

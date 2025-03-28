@@ -30,7 +30,7 @@ var cloneCmd = &cobra.Command{
 	Long: fmt.Sprintf(`Clone a git project into your projects home
 
 	$ dpm clone git@github.com:iainvm/dpm.git
-	Clones the project into $%s_%s/github.com/iainvm/dpm`, CONFIG_ENV_PREFIX, strings.ToUpper(config.KEY_PROJECTS_HOME)),
+	Clones the project into $%s_%s/github.com/iainvm/dpm`, config.ENV_PREFIX, strings.ToUpper(config.KEY_PROJECTS_HOME)),
 	Run: func(cmd *cobra.Command, args []string) {
 		clone(args)
 	},
