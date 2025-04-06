@@ -10,4 +10,4 @@ tasks:
   build:
     desc: Build the project
     cmds:
-      - nix build
+      - nix build -L

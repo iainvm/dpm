@@ -9,12 +9,12 @@ import (
 
 const (
 	ENV_PREFIX               string = "DPM"
-	KEY_PROJECTS_HOME        string = "projects_home"
+	PROJECTS_DIR             string = "projects_dir"
 	KEY_PRIVATE_KEY_LOCATION string = "private_key_location"
 )
 
-func GetProjectsHome() (string, error) {
-	path, err := getAsAbsolutePath(KEY_PROJECTS_HOME)
+func ProjectsDir() (string, error) {
+	path, err := getAsAbsolutePath(PROJECTS_DIR)
 	return path, err
 }
 

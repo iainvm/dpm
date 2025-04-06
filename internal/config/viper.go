@@ -9,11 +9,15 @@ import (
 	"github.com/spf13/viper"
 )
 
+func SetDefaults() {
+	viper.SetDefault(PROJECTS_DIR, "~/dev")
+}
+
 // Load loads the configuration from the default file or the given configFile path
 func Load(prefix string, configPath string) error {
 	slog.Debug(
 		"Loading config file",
-		slog.String("file", viper.ConfigFileUsed()),
+		slog.String("file", configPath),
 	)
 
 	if configPath != "" {

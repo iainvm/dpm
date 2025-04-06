@@ -1,16 +1,18 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 
 	"github.com/iainvm/dpm/internal/config"
+	"github.com/iainvm/dpm/internal/logger"
 )
 
-var configPath string
+var flags struct {
+	configPath string
+	verbose    bool
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -29,26 +31,20 @@ func Execute() {
 	}
 }
 
-func verbosePrintf(location *os.File, message string, args ...interface{}) {
-	verbose, _ := rootCmd.PersistentFlags().GetBool("verbose")
-	if verbose {
-		fmt.Fprintf(location, message, args...)
-	}
-}
-
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "config file (default is $HOME/.config/dpm/config.yaml)")
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Log more details")
-
-	// Viper Config
-	viper.SetDefault(config.KEY_PROJECTS_HOME, "~/dev")
+	rootCmd.PersistentFlags().StringVar(&flags.configPath, "config", "", "config file (default is $HOME/.config/dpm/config.yaml)")
+	rootCmd.PersistentFlags().BoolVarP(&flags.verbose, "verbose", "v", false, "log additional information")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	err := config.Load("DPM", configPath)
+	// Setup logger
+	_ = logger.New(flags.verbose)
+
+	// Setup config
+	err := config.Load("DPM", flags.configPath)
 	if err != nil {
 		panic(err)
 	}

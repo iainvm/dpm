@@ -44,7 +44,7 @@ func TestGetProjectPath(t *testing.T) {
 
 	var result string
 	for url, expected := range testCases {
-		result = GetProjectPath(url)
+		result = URLAsPath(url)
 
 		if result != expected {
 			t.Errorf("Expected %s, but got %s", expected, result)

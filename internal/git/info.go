@@ -37,10 +37,11 @@ func TranslateToHTTP(url string) string {
 	return url
 }
 
-// GetProjectPath deconstructs the url given and determines the directory path it for the project
+// URLAsPath deconstructs the url given and determines the directory path it for the project
 // e.g. git@github.com:iainvm/dpm.git     -> github.com/iainvm/dpm
-//      https://github.com/iainvm/dpm.git -> github.com/iainvm/dpm
-func GetProjectPath(url string) string {
+//
+//	https://github.com/iainvm/dpm.git -> github.com/iainvm/dpm
+func URLAsPath(url string) string {
 	var project_path string
 	project_path = TranslateToHTTP(url)
 	project_path = strings.Replace(project_path, "https://", "", 1)
@@ -52,7 +53,7 @@ func GetProjectPath(url string) string {
 	return project_path
 }
 
-func GetProjectPathsInPath(path string) ([]string, error) {
+func SearchPathForGit(path string) ([]string, error) {
 	var gitProjects []string
 
 	folders, err := system.GetDirectoriesInPath(path)

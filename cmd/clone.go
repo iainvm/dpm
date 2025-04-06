@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -30,7 +32,7 @@ var cloneCmd = &cobra.Command{
 	Long: fmt.Sprintf(`Clone a git project into your projects home
 
 	$ dpm clone git@github.com:iainvm/dpm.git
-	Clones the project into $%s_%s/github.com/iainvm/dpm`, config.ENV_PREFIX, strings.ToUpper(config.KEY_PROJECTS_HOME)),
+	Clones the project into $%s_%s/github.com/iainvm/dpm`, config.ENV_PREFIX, strings.ToUpper(config.PROJECTS_DIR)),
 	Run: func(cmd *cobra.Command, args []string) {
 		clone(args)
 	},
@@ -43,18 +45,28 @@ func init() {
 }
 
 func clone(args []string) {
-	// Process args
+	ctx := context.Background()
+
+	// Get args
 	url := args[0]
 
-	// Get additional info
-	projects_home, err := config.GetProjectsHome()
+	// Get Project Dir
+	projectDir, err := config.ProjectsDir()
 	cobra.CheckErr(err)
+
+	// Get private key for git
 	privateKeyLocation, err := config.GetPrivateKeyLocation()
 	cobra.CheckErr(err)
 
 	// Validate if project exists
-	var absoluteProjectPath string = projects_home + "/" + git.GetProjectPath(url)
-	verbosePrintf(os.Stdout, "Project path: %s\n", absoluteProjectPath)
+	absoluteProjectPath := fmt.Sprintf("%s/%s", projectDir, git.URLAsPath(url))
+	slog.DebugContext(
+		ctx,
+		"Path to clone to",
+		slog.String("path", absoluteProjectPath),
+	)
+
+	// Check if project exists at that path
 	projectExists, err := system.DoesFolderExist(absoluteProjectPath)
 	cobra.CheckErr(err)
 	if projectExists {
@@ -63,7 +75,6 @@ func clone(args []string) {
 	}
 
 	// Clone project if it doesn't exist
-	verbosePrintf(os.Stdout, "Cloning\n")
 	_, err = git.Clone(url, absoluteProjectPath, privateKeyLocation)
 	cobra.CheckErr(err)
 }
