@@ -30,8 +30,27 @@
       };
     }
     // flake-utils.lib.eachDefaultSystem (system: {
-      devShells = import ./devShell/configuration.nix {
-        inherit inputs system;
+      devShells = {
+        default = pkgs.mkShell {
+          packages = with pkgs; [
+            # Git
+            git
+
+            # Nix LSP
+            nixd
+            # Nix Formatter
+            alejandra
+
+            # Taskfile
+            go-task
+
+            # Go
+            go_1_24
+            gopls
+            delve
+            gotools
+          ];
+        };
       };
     });
 }
