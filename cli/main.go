@@ -1,15 +1,17 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"os"
 
+	"github.com/charmbracelet/fang"
 	"github.com/spf13/cobra"
 )
 
 type command struct {
 	command     *cobra.Command
-	flags       func(parentCmd *cobra.Command, cmd *cobra.Command)
+	flags       func(cmd *cobra.Command)
 	subcommands []command
 }
 
@@ -22,11 +24,27 @@ var (
 			Long:  `A tool to manage development projects`,
 			Run:   nil,
 		},
-		flags: func(parentCmd *cobra.Command, cmd *cobra.Command) {
-			cmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/dpm/config.yaml)")
-			cmd.PersistentFlags().BoolP("verbose", "v", false, "Log more details")
+		flags: func(cmd *cobra.Command) {
+			cmd.PersistentFlags().StringVar(&cfgFile, "config", "~/.config/dpm/config.yaml", "Location of configuration file")
+			cmd.PersistentFlags().BoolP("verbose", "v", false, "Enable more detailed logs")
 		},
 		subcommands: []command{
+			{
+				command: &cobra.Command{
+					Use:   "clone",
+					Short: "Clone a project",
+					Long:  `Clone a git repo to the managed project directory`,
+					Run: func(cmd *cobra.Command, args []string) {
+						slog.Info("clone command executed")
+						// parse args
+						// call dpm.clone
+					},
+				},
+				flags: func(cmd *cobra.Command) {
+					cmd.PersistentFlags().BoolP("short", "s", false, "Output shortened to just project path")
+					cmd.PersistentFlags().String("ssh-key-path", "~/.ssh/id_rsa", "Path to the private key to use for git authentication")
+				},
+			},
 			{
 				command: &cobra.Command{
 					Use:   "list",
@@ -38,7 +56,7 @@ var (
 						// call dpm.list
 					},
 				},
-				flags: func(parentCmd *cobra.Command, cmd *cobra.Command) {
+				flags: func(cmd *cobra.Command) {
 					cmd.PersistentFlags().BoolP("name", "n", false, "Only return project names")
 				},
 			},
@@ -49,7 +67,7 @@ var (
 func setupCommands(parentCommand *cobra.Command, commands []command) error {
 	for _, cmd := range commands {
 		// Register Flags
-		cmd.flags(parentCommand, cmd.command)
+		cmd.flags(cmd.command)
 
 		// Add command as subcommand
 		if parentCommand != nil {
@@ -77,8 +95,7 @@ func main() {
 	}
 
 	// Execute
-	err = rootCmd.command.Execute()
-	if err != nil {
+	if err := fang.Execute(context.Background(), rootCmd.command); err != nil {
 		os.Exit(1)
 	}
 }
