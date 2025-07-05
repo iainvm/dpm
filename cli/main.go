@@ -7,8 +7,9 @@ import (
 	"os"
 
 	"github.com/charmbracelet/fang"
-	"github.com/iainvm/dpm/dpm"
 	"github.com/spf13/cobra"
+
+	"github.com/iainvm/dpm/dpm"
 )
 
 type command struct {
@@ -37,9 +38,9 @@ var (
 					Short: "Clone a project",
 					Long:  `Clone a git repo to the managed project directory`,
 					Run: func(cmd *cobra.Command, args []string) {
-						slog.Info("clone command executed")
+						slog.Debug("Clone command executed")
 						// parse args
-						err := dpm.Clone(cmd.Context(), "/home/river/dev2", "git@github.com:iainvm/dpm.git")
+						err := dpm.Clone(cmd.Context(), "/home/iain/dev2", "git@github.com:iainvm/dpm.git")
 						fmt.Printf("%#v", err)
 					},
 				},

@@ -6,11 +6,16 @@ import (
 )
 
 const (
-	urlRegex = `^(([A-Za-z0-9]+@|http(|s)\:\/\/)|(http(|s)\:\/\/[A-Za-z0-9]+@))([A-Za-z0-9.]+(:\d+)?)(?::|\/)([\d\/\w.-]+?)(\.git){1}$`
-	// ^(?:(ssh|git|http(?:s)?):\/\/)?
+	// Capture Groups: protocol, user, host, port, path
+	urlRegex = `^(?:(ssh|git|https?|git):\/\/)?(?:([\w\-]+)@)?([\w\.\-]+)(?::(\d+))?[:/]((?:~?[\w\-]+\/)?[\w\-./]+(?:\.git)?)\/?$`
 )
 
 func GetUserFromURL(url string) string {
+	r := regexp.MustCompile(urlRegex)
+
+	// Find matching groups
+	groups := r.FindStringSubmatch(url)
+	return groups[2]
 }
 
 // IsValidURL validates the given url against a RegEx to determine it's of an accepted format
@@ -32,10 +37,11 @@ func SplitURL(url string) []string {
 	groups := r.FindStringSubmatch(url)
 
 	// Get the website from the groups
-	site, _, _ := strings.Cut(groups[6], ":")
+	site := groups[3]
 
 	// Get the rest of the subdirectories
-	subdirs := strings.Split(groups[8], "/")
+	path, _ := strings.CutSuffix(groups[5], ".git")
+	subdirs := strings.Split(path, "/")
 
 	// Add the elements to a slice
 	elements := make([]string, 1+len(subdirs))

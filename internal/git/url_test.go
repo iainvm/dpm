@@ -3,8 +3,9 @@ package git_test
 import (
 	"testing"
 
-	"github.com/iainvm/dpm/internal/git"
 	"github.com/stretchr/testify/require"
+
+	"github.com/iainvm/dpm/internal/git"
 )
 
 func TestIsValidURL(t *testing.T) {
@@ -41,16 +42,16 @@ func TestIsValidURL(t *testing.T) {
 		{
 			name:     "No user URL",
 			url:      "gitlab.com:owner/a/b/c/project.git",
-			expected: false,
-		},
-		{
-			name:     "Wrong protocol URL",
-			url:      "ftp://gitlab.com:owner/a/b/c/project.git",
-			expected: false,
+			expected: true,
 		},
 		{
 			name:     "Slash not colon URL",
 			url:      "git@gitlab.com/owner/a/b/c/project.git",
+			expected: true,
+		},
+		{
+			name:     "Wrong protocol URL",
+			url:      "ftp://gitlab.com:owner/a/b/c/project.git",
 			expected: false,
 		},
 	}
