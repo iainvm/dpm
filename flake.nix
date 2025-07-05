@@ -32,6 +32,14 @@
     // flake-utils.lib.eachDefaultSystem (system: {
       devShells = {
         default = pkgs.mkShell {
+          shellHook = ''
+            export GOPRIVATE="github.com/iainvm"
+            export GONOPROXY="github.com/iainvm"
+          '';
+
+          # Required for debugging Go
+          hardeningDisable = ["fortify"];
+
           packages = with pkgs; [
             # Git
             git

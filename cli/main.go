@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 
 	"github.com/charmbracelet/fang"
+	"github.com/iainvm/dpm/dpm"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +39,8 @@ var (
 					Run: func(cmd *cobra.Command, args []string) {
 						slog.Info("clone command executed")
 						// parse args
-						// call dpm.clone
+						err := dpm.Clone(cmd.Context(), "/home/river/dev2", "git@github.com:iainvm/dpm.git")
+						fmt.Printf("%#v", err)
 					},
 				},
 				flags: func(cmd *cobra.Command) {
@@ -64,7 +67,30 @@ var (
 	}
 )
 
-func setupCommands(parentCommand *cobra.Command, commands []command) error {
+func main() {
+	// Create execution context
+	ctx := context.Background()
+
+	// Setup command structure
+	err := registerCommands(nil, []command{rootCmd})
+	if err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to process command structure",
+			slog.Any("error", err),
+		)
+		os.Exit(1)
+	}
+
+	// Execute
+	if err := fang.Execute(ctx, rootCmd.command); err != nil {
+		os.Exit(1)
+	}
+}
+
+// registerCommands recurses through the given command struct registering flags, and subcommands.
+// `parentCommand` should be `nil` for the top level command.
+func registerCommands(parentCommand *cobra.Command, commands []command) error {
 	for _, cmd := range commands {
 		// Register Flags
 		cmd.flags(cmd.command)
@@ -75,27 +101,11 @@ func setupCommands(parentCommand *cobra.Command, commands []command) error {
 		}
 
 		// Process subcommands
-		err := setupCommands(cmd.command, cmd.subcommands)
+		err := registerCommands(cmd.command, cmd.subcommands)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-func main() {
-	err := setupCommands(nil, []command{rootCmd})
-	if err != nil {
-		slog.Error(
-			"failed to process command structure",
-			slog.Any("error", err),
-		)
-		os.Exit(1)
-	}
-
-	// Execute
-	if err := fang.Execute(context.Background(), rootCmd.command); err != nil {
-		os.Exit(1)
-	}
 }
