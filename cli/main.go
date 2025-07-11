@@ -47,6 +47,7 @@ var (
 					Use:   "clone",
 					Short: "Clone a project",
 					Long:  `Clone a git repo to the managed project directory`,
+					Args:  cobra.MatchAll(cobra.ExactArgs(1)),
 					RunE:  cloneCmd,
 				},
 				flags: func(cmd *cobra.Command) {
@@ -74,6 +75,9 @@ func main() {
 	// Create execution context
 	ctx := context.Background()
 
+	// Set version
+	rootCmd.command.SetVersionTemplate(version)
+
 	// Setup command structure
 	err := registerCommands(nil, []command{rootCmd})
 	if err != nil {
@@ -87,11 +91,6 @@ func main() {
 
 	// Execute
 	if err := fang.Execute(ctx, rootCmd.command); err != nil {
-		slog.ErrorContext(
-			ctx,
-			"command failed",
-			slog.Any("error", err),
-		)
 		os.Exit(1)
 	}
 }

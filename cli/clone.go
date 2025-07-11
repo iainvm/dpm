@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// cloneCmd parses the CLI args, and calls the dpm.Clone command
 func cloneCmd(cmd *cobra.Command, args []string) error {
 	slog.DebugContext(
 		cmd.Context(),
@@ -22,9 +23,13 @@ func cloneCmd(cmd *cobra.Command, args []string) error {
 		),
 		slog.String("used_config", viper.ConfigFileUsed()),
 	)
-	// parse args
+
+	// Parse args
 	url := args[0]
-	err := dpm.Clone(cmd.Context(), viper.GetString("projects-home"), url)
+	projectsDir := viper.GetString("projects-home")
+
+	// Call dpm actions
+	err := dpm.Clone(cmd.Context(), projectsDir, url)
 	if err != nil {
 		return err
 	}
