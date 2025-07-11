@@ -44,11 +44,12 @@ var (
 		subcommands: []command{
 			{
 				command: &cobra.Command{
-					Use:   "clone",
-					Short: "Clone a project",
-					Long:  `Clone a git repo to the managed project directory`,
-					Args:  cobra.MatchAll(cobra.ExactArgs(1)),
-					RunE:  cloneCmd,
+					Use:     "clone",
+					Short:   "Clone a project",
+					Long:    `Clone a git repo to the managed project directory`,
+					Example: "dpm clone git@github.com:iainvm/dpm.git",
+					Args:    cobra.MatchAll(cobra.ExactArgs(1)),
+					RunE:    cloneCmd,
 				},
 				flags: func(cmd *cobra.Command) {
 					cmd.PersistentFlags().BoolP("short", "s", false, "Output shortened to just project path")
