@@ -4,12 +4,9 @@ import (
 	"context"
 	"log/slog"
 	"os"
-	"strings"
 
 	"github.com/charmbracelet/fang"
-	"github.com/phsym/console-slog"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type command struct {
@@ -17,10 +14,6 @@ type command struct {
 	flags       func(cmd *cobra.Command)
 	subcommands []command
 }
-
-const (
-	envPrefix = "DPM"
-)
 
 var (
 	version string = "local"
@@ -38,7 +31,7 @@ var (
 				}
 
 				// Setup Logging
-				setupLogging()
+				newLogger()
 
 				return nil
 			},
@@ -101,52 +94,6 @@ func main() {
 		)
 		os.Exit(1)
 	}
-}
-
-func viperSetup(cmd *cobra.Command) error {
-	// Bing flags to viper
-	// Happens first so viper can get the keys to search the other places
-	if err := viper.BindPFlags(cmd.Flags()); err != nil {
-		return err
-	}
-
-	// Environment Variables
-	viper.SetEnvPrefix(envPrefix)
-	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
-	viper.AutomaticEnv()
-
-	// Config
-	viper.SetConfigFile(viper.GetString("config"))
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		return err
-	}
-
-	return nil
-}
-
-func setupLogging() {
-	// Default to not logging anything
-	var level slog.Level = 9
-	if viper.GetBool("verbose") {
-		level = slog.LevelDebug
-	}
-
-	// Setup a pretty console logger
-	logger := slog.New(
-		console.NewHandler(
-			os.Stderr,
-			&console.HandlerOptions{
-				Level:     level,
-				AddSource: true,
-			},
-		),
-	)
-	logger = logger.With(
-		slog.String("version", version),
-	)
-	slog.SetDefault(logger)
 }
 
 // registerCommands recurses through the given command struct registering flags, and subcommands.
