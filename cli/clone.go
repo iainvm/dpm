@@ -17,14 +17,7 @@ func cloneCmd(cmd *cobra.Command, args []string) error {
 	slog.DebugContext(
 		cmd.Context(),
 		"Clone command executed",
-		slog.Group(
-			"flags",
-			slog.String("config", viper.GetString("config")),
-			slog.String("dev-directory", viper.GetString("dev-directory")),
-			slog.Bool("verbose", viper.GetBool("verbose")),
-			slog.Bool("short", viper.GetBool("short")),
-			slog.String("identity-file", viper.GetString("identity-file")),
-		),
+		slog.Any("flags", viper.AllSettings()),
 		slog.String("used_config", viper.ConfigFileUsed()),
 	)
 

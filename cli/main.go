@@ -38,7 +38,7 @@ var (
 		},
 		flags: func(cmd *cobra.Command) {
 			cmd.PersistentFlags().String("config", "$HOME/.config/dpm/config.yml", "Location of configuration file")
-			cmd.PersistentFlags().StringP("dev-directory", "p", "$HOME/dev", "Where all the dev projects go")
+			cmd.PersistentFlags().StringP("dev-directory", "d", "$HOME/dev", "Where all the dev projects go")
 			cmd.PersistentFlags().BoolP("verbose", "v", false, "Enable more detailed logs")
 		},
 		subcommands: []command{

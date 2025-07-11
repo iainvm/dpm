@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	github.com/charmbracelet/fang v0.3.0
 	github.com/go-git/go-git/v6 v6.0.0-20250701074610-5d6af409877b
-	github.com/phsym/console-slog v0.3.1
+	github.com/golang-cz/devslog v0.0.15
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0

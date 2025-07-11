@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/phsym/console-slog"
+	"github.com/golang-cz/devslog"
 	"github.com/spf13/viper"
 )
 
@@ -16,15 +16,13 @@ func newLogger() {
 	}
 
 	// Setup a pretty console logger
-	logger := slog.New(
-		console.NewHandler(
-			os.Stderr,
-			&console.HandlerOptions{
-				Level:     level,
-				AddSource: true,
-			},
-		),
-	)
+	logger := slog.New(devslog.NewHandler(os.Stderr, &devslog.Options{
+		HandlerOptions: &slog.HandlerOptions{
+			AddSource: true,
+			Level:     level,
+		},
+	}))
+
 	logger = logger.With(
 		slog.String("version", version),
 	)
