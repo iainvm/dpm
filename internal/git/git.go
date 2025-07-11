@@ -3,6 +3,7 @@ package git
 import (
 	"context"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 
@@ -11,12 +12,13 @@ import (
 )
 
 // Clone will git clone the git repository to the given directory, using the keyLocation and keyPassword for authentication
-func Clone(ctx context.Context, url string, directory string) (*git.Repository, error) {
+func Clone(ctx context.Context, url string, directory string, silent bool) (*git.Repository, error) {
 	slog.DebugContext(
 		ctx,
 		"Cloning git repository",
 		slog.String("url", url),
 		slog.String("target", directory),
+		slog.Bool("log", silent),
 	)
 
 	// Use SSH Agent
@@ -26,11 +28,17 @@ func Clone(ctx context.Context, url string, directory string) (*git.Repository, 
 		return nil, fmt.Errorf("failed to access SSH Agent: %w", err)
 	}
 
+	// Determine if progress should be logged
+	var progress io.Writer = nil
+	if !silent {
+		progress = os.Stdout
+	}
+
 	// Clone project
 	project, err := git.PlainClone(directory, &git.CloneOptions{
 		Auth:     authMethod,
 		URL:      url,
-		Progress: os.Stdout,
+		Progress: progress,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to clone: %w", err)

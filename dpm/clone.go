@@ -9,8 +9,12 @@ import (
 	"github.com/iainvm/dpm/internal/git"
 )
 
+type CloneOptions struct {
+	Short bool
+}
+
 // Clone takes a url, and authFile to use git to clone a repository
-func Clone(ctx context.Context, devDir string, url string) (string, error) {
+func Clone(ctx context.Context, devDir string, url string, options *CloneOptions) (string, error) {
 	// Check URL is valid
 	if !git.IsValidURL(url) {
 		return "", fmt.Errorf("received invalid git URL: %s", url)
@@ -38,7 +42,7 @@ func Clone(ctx context.Context, devDir string, url string) (string, error) {
 	)
 
 	// Clone the repo to the directory
-	_, err = git.Clone(ctx, url, directory)
+	_, err = git.Clone(ctx, url, directory, options.Short)
 	if err != nil {
 		slog.ErrorContext(
 			ctx,

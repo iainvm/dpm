@@ -38,8 +38,13 @@ func cloneCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	// Options
+	options := &dpm.CloneOptions{
+		Short: viper.GetBool("short"),
+	}
+
 	// Call dpm actions
-	location, err := dpm.Clone(cmd.Context(), devDir, url)
+	location, err := dpm.Clone(cmd.Context(), devDir, url, options)
 	if err != nil {
 		return err
 	}
