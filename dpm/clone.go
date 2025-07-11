@@ -5,31 +5,29 @@ import (
 	"fmt"
 	"log/slog"
 	"path"
-	"strings"
 
 	"github.com/iainvm/dpm/internal/git"
 )
 
 // Clone takes a url, and authFile to use git to clone a repository
-func Clone(ctx context.Context, devDir string, url string) error {
+func Clone(ctx context.Context, devDir string, url string) (string, error) {
 	// Check URL is valid
 	if !git.IsValidURL(url) {
-		return fmt.Errorf("received invalid git URL: %s", url)
+		return "", fmt.Errorf("received invalid git URL: %s", url)
 	}
 
 	// Calculate directory to clone to
-	repoInfo, err := git.GetInfo(url)
+	urlInfo, err := git.GetInfo(url)
 	if err != nil {
 		slog.ErrorContext(
 			ctx,
 			"failed to get repo info",
 			slog.Any("error", err),
 		)
-		return fmt.Errorf("failed to get repo info: %w", err)
+		return "", fmt.Errorf("failed to get repo info: %w", err)
 	}
 
-	repoPath := strings.Split(*repoInfo.Path, "/")
-	directory := path.Join(devDir, path.Join(repoPath...))
+	directory := path.Join(devDir, *urlInfo.Host, *urlInfo.Path)
 
 	slog.DebugContext(
 		ctx,
@@ -47,8 +45,8 @@ func Clone(ctx context.Context, devDir string, url string) error {
 			"failed to clone git repo",
 			slog.Any("error", err),
 		)
-		return fmt.Errorf("failed to clone git repo: %w", err)
+		return "", fmt.Errorf("failed to clone git repo to '%s': %w", directory, err)
 	}
 
-	return nil
+	return directory, nil
 }

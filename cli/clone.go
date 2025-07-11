@@ -1,7 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/iainvm/dpm/dpm"
 	"github.com/spf13/cobra"
@@ -16,7 +20,7 @@ func cloneCmd(cmd *cobra.Command, args []string) error {
 		slog.Group(
 			"flags",
 			slog.String("config", viper.GetString("config")),
-			slog.String("projects-home", viper.GetString("projects-home")),
+			slog.String("dev-directory", viper.GetString("dev-directory")),
 			slog.Bool("verbose", viper.GetBool("verbose")),
 			slog.Bool("short", viper.GetBool("short")),
 			slog.String("identity-file", viper.GetString("identity-file")),
@@ -26,13 +30,31 @@ func cloneCmd(cmd *cobra.Command, args []string) error {
 
 	// Parse args
 	url := args[0]
-	projectsDir := viper.GetString("projects-home")
 
-	// Call dpm actions
-	err := dpm.Clone(cmd.Context(), projectsDir, url)
+	// Parse and replace HOME in dev directory path
+	devDir := viper.GetString("dev-directory")
+	devDir, err := replaceHome(devDir)
 	if err != nil {
 		return err
 	}
 
+	// Call dpm actions
+	location, err := dpm.Clone(cmd.Context(), devDir, url)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprint(os.Stdout, location)
 	return nil
+}
+
+func replaceHome(path string) (string, error) {
+	if strings.HasPrefix(path, "$HOME") {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+		path = filepath.Join(homeDir, strings.TrimPrefix(path, "$HOME"))
+	}
+	return filepath.Abs(path)
 }

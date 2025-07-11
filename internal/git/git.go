@@ -33,7 +33,7 @@ func Clone(ctx context.Context, url string, directory string) (*git.Repository, 
 		Progress: os.Stdout,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to clone git repo: %w", err)
+		return nil, fmt.Errorf("failed to clone: %w", err)
 	}
 
 	return project, nil
