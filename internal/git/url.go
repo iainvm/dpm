@@ -1,7 +1,9 @@
 package git
 
 import (
+	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -9,6 +11,14 @@ const (
 	// Capture Groups: protocol, user, host, port, path
 	urlRegex = `^(?:(ssh|git|https?|git):\/\/)?(?:([\w\-]+)@)?([\w\.\-]+)(?::(\d+))?[:/]((?:~?[\w\-]+\/)?[\w\-./]+(?:\.git)?)\/?$`
 )
+
+type URLInfo struct {
+	Protocol *string
+	User     *string
+	Host     *string
+	Port     *int
+	Path     *string
+}
 
 func GetUserFromURL(url string) string {
 	r := regexp.MustCompile(urlRegex)
@@ -25,30 +35,56 @@ func IsValidURL(url string) bool {
 	return matched
 }
 
-// SplitURL will parse the git repository URL and break it down into URL, groups, and project
-//
-//	"git@github.com:iainvm/dpm.git" => ["github.com", "iainvm", "dpm"]
-//	"git@gitlab.com:company/product/project.git" => ["gitlab.com", "company", "product", "project"]
-func SplitURL(url string) []string {
+// GetInfo will parse the git repository URL and determine the protocol, user, host, port, and path
+func GetInfo(url string) (URLInfo, error) {
 	// Initialise regex
 	r := regexp.MustCompile(urlRegex)
 
 	// Find matching groups
 	groups := r.FindStringSubmatch(url)
 
-	// Get the website from the groups
-	site := groups[3]
-
-	// Get the rest of the subdirectories
-	path, _ := strings.CutSuffix(groups[5], ".git")
-	subdirs := strings.Split(path, "/")
-
-	// Add the elements to a slice
-	elements := make([]string, 1+len(subdirs))
-	elements[0] = site
-	for i, dir := range subdirs {
-		elements[i+1] = dir
+	// Parse protocol
+	var protocol *string
+	if groups[1] != "" {
+		protocol = &groups[1]
 	}
 
-	return elements
+	// Parse user
+	var user *string
+	if groups[2] != "" {
+		user = &groups[2]
+	}
+
+	// Parse host
+	var host *string
+	if groups[3] != "" {
+		host = &groups[3]
+	}
+
+	// Parse port
+	var port *int
+	if groups[4] != "" {
+		data, err := strconv.Atoi(groups[4])
+		if err != nil {
+			return URLInfo{}, fmt.Errorf("failed to parse repo path: %w", err)
+		}
+		port = &data
+	}
+
+	// Parse Path
+	var path *string
+	if groups[5] != "" {
+		data, _ := strings.CutSuffix(groups[5], ".git")
+		path = &data
+	}
+
+	split := URLInfo{
+		Protocol: protocol,
+		User:     user,
+		Host:     host,
+		Port:     port,
+		Path:     path,
+	}
+
+	return split, nil
 }

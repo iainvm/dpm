@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"path"
+	"strings"
 
 	"github.com/iainvm/dpm/internal/git"
 )
@@ -17,8 +18,18 @@ func Clone(ctx context.Context, devDir string, url string) error {
 	}
 
 	// Calculate directory to clone to
-	projectPath := git.SplitURL(url)
-	directory := path.Join(devDir, path.Join(projectPath...))
+	repoInfo, err := git.GetInfo(url)
+	if err != nil {
+		slog.ErrorContext(
+			ctx,
+			"failed to get repo info",
+			slog.Any("error", err),
+		)
+		return fmt.Errorf("failed to get repo info: %w", err)
+	}
+
+	repoPath := strings.Split(*repoInfo.Path, "/")
+	directory := path.Join(devDir, path.Join(repoPath...))
 
 	slog.DebugContext(
 		ctx,
@@ -29,7 +40,7 @@ func Clone(ctx context.Context, devDir string, url string) error {
 	)
 
 	// Clone the repo to the directory
-	_, err := git.Clone(ctx, url, directory)
+	_, err = git.Clone(ctx, url, directory)
 	if err != nil {
 		slog.ErrorContext(
 			ctx,

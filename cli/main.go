@@ -40,7 +40,7 @@ var (
 					Run: func(cmd *cobra.Command, args []string) {
 						slog.Debug("Clone command executed")
 						// parse args
-						err := dpm.Clone(cmd.Context(), "/home/iain/dev2", "git@github.com:iainvm/dpm.git")
+						err := dpm.Clone(cmd.Context(), "/home/river/dev2", "git@github.com:iainvm/dpm.git")
 						fmt.Printf("%#v", err)
 					},
 				},
