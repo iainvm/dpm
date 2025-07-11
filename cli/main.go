@@ -2,14 +2,14 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/charmbracelet/fang"
+	"github.com/phsym/console-slog"
 	"github.com/spf13/cobra"
-
-	"github.com/iainvm/dpm/dpm"
+	"github.com/spf13/viper"
 )
 
 type command struct {
@@ -18,17 +18,34 @@ type command struct {
 	subcommands []command
 }
 
+const (
+	envPrefix = "DPM"
+)
+
 var (
-	cfgFile string
-	rootCmd = command{
+	version string = "local"
+	rootCmd        = command{
 		command: &cobra.Command{
 			Use:   "dpm",
 			Short: "Development Project Manager",
 			Long:  `A tool to manage development projects`,
 			Run:   nil,
+			PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+				// Setup Viper
+				err := viperSetup(cmd)
+				if err != nil {
+					return err
+				}
+
+				// Setup Logging
+				setupLogging()
+
+				return nil
+			},
 		},
 		flags: func(cmd *cobra.Command) {
-			cmd.PersistentFlags().StringVar(&cfgFile, "config", "~/.config/dpm/config.yaml", "Location of configuration file")
+			cmd.PersistentFlags().String("config", "$HOME/.config/dpm/config.yml", "Location of configuration file")
+			cmd.PersistentFlags().StringP("projects-home", "p", "$HOME/dev", "Projects location")
 			cmd.PersistentFlags().BoolP("verbose", "v", false, "Enable more detailed logs")
 		},
 		subcommands: []command{
@@ -37,31 +54,23 @@ var (
 					Use:   "clone",
 					Short: "Clone a project",
 					Long:  `Clone a git repo to the managed project directory`,
-					Run: func(cmd *cobra.Command, args []string) {
-						slog.Debug("Clone command executed")
-						// parse args
-						err := dpm.Clone(cmd.Context(), "/home/river/dev2", "git@github.com:iainvm/dpm.git")
-						fmt.Printf("%#v", err)
-					},
+					RunE:  cloneCmd,
 				},
 				flags: func(cmd *cobra.Command) {
 					cmd.PersistentFlags().BoolP("short", "s", false, "Output shortened to just project path")
-					cmd.PersistentFlags().String("ssh-key-path", "~/.ssh/id_rsa", "Path to the private key to use for git authentication")
+					cmd.PersistentFlags().StringP("identity-file", "i", "$HOME/.ssh/id_rsa", "Path to the private key to use for git authentication")
 				},
+				subcommands: []command{},
 			},
 			{
 				command: &cobra.Command{
 					Use:   "list",
 					Short: "List projects",
 					Long:  `Lists all the known git repos`,
-					Run: func(cmd *cobra.Command, args []string) {
-						slog.Info("list command executed")
-						// parse args
-						// call dpm.list
-					},
+					RunE:  listCmd,
 				},
 				flags: func(cmd *cobra.Command) {
-					cmd.PersistentFlags().BoolP("name", "n", false, "Only return project names")
+					cmd.PersistentFlags().BoolP("names", "n", false, "Only return project names")
 				},
 			},
 		},
@@ -85,8 +94,59 @@ func main() {
 
 	// Execute
 	if err := fang.Execute(ctx, rootCmd.command); err != nil {
+		slog.ErrorContext(
+			ctx,
+			"command failed",
+			slog.Any("error", err),
+		)
 		os.Exit(1)
 	}
+}
+
+func viperSetup(cmd *cobra.Command) error {
+	// Bing flags to viper
+	// Happens first so viper can get the keys to search the other places
+	if err := viper.BindPFlags(cmd.Flags()); err != nil {
+		return err
+	}
+
+	// Environment Variables
+	viper.SetEnvPrefix(envPrefix)
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+	viper.AutomaticEnv()
+
+	// Config
+	viper.SetConfigFile(viper.GetString("config"))
+
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		return err
+	}
+
+	return nil
+}
+
+func setupLogging() {
+	// Default to not logging anything
+	var level slog.Level = 9
+	if viper.GetBool("verbose") {
+		level = slog.LevelDebug
+	}
+
+	// Setup a pretty console logger
+	logger := slog.New(
+		console.NewHandler(
+			os.Stderr,
+			&console.HandlerOptions{
+				Level:     level,
+				AddSource: true,
+			},
+		),
+	)
+	logger = logger.With(
+		slog.String("version", version),
+	)
+	slog.SetDefault(logger)
 }
 
 // registerCommands recurses through the given command struct registering flags, and subcommands.
