@@ -51,10 +51,7 @@ var (
 					Args:    cobra.MatchAll(cobra.ExactArgs(1)),
 					RunE:    cloneCmd,
 				},
-				flags: func(cmd *cobra.Command) {
-					cmd.PersistentFlags().BoolP("short", "s", false, "Output shortened to just project path")
-					cmd.PersistentFlags().StringP("identity-file", "i", "$HOME/.ssh/id_rsa", "Path to the private key to use for git authentication")
-				},
+				flags:       func(cmd *cobra.Command) {},
 				subcommands: []command{},
 			},
 			{

@@ -32,9 +32,7 @@ func cloneCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	// Options
-	options := &dpm.CloneOptions{
-		Short: viper.GetBool("short"),
-	}
+	options := &dpm.CloneOptions{}
 
 	// Call dpm actions
 	location, err := dpm.Clone(cmd.Context(), devDir, url, options)

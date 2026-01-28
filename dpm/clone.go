@@ -9,9 +9,7 @@ import (
 	"github.com/iainvm/dpm/internal/git"
 )
 
-type CloneOptions struct {
-	Short bool
-}
+type CloneOptions struct{}
 
 // Clone takes a url, and authFile to use git to clone a repository
 func Clone(ctx context.Context, devDir string, url string, options *CloneOptions) (string, error) {
@@ -42,7 +40,7 @@ func Clone(ctx context.Context, devDir string, url string, options *CloneOptions
 	directory := path.Join(devDir, *urlInfo.Host, *urlInfo.Path)
 
 	// Clone the repo to the directory
-	_, err = git.Clone(ctx, url, directory, options.Short)
+	err = git.Clone(ctx, url, directory)
 	if err != nil {
 		slog.ErrorContext(
 			ctx,
