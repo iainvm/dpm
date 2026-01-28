@@ -6,6 +6,8 @@ import (
 	"log/slog"
 
 	"github.com/hashicorp/go-getter"
+
+	"github.com/iainvm/dpm/internal/filesystem"
 )
 
 // Clone will clone the git repository to the given directory
@@ -16,6 +18,11 @@ func Clone(ctx context.Context, url string, directory string) error {
 		slog.String("url", url),
 		slog.String("target", directory),
 	)
+
+	exists := filesystem.IsExists(directory)
+	if exists {
+		return fmt.Errorf("cannot clone, directory already exists: %s", directory)
+	}
 
 	// Create client to clone given project
 	client := getter.Client{

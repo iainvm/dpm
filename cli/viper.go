@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -29,8 +30,13 @@ func viperSetup(cmd *cobra.Command) error {
 
 	// If a config file is found, read it in.
 	err := viper.ReadInConfig()
+	if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+		// Config file not found, initialize config file
+		viper.SafeWriteConfig()
+		// log.Fatal("Please populate config file with appropriate values")
+	}
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read config file: %w", err)
 	}
 
 	return nil

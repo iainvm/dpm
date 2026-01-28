@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
@@ -14,7 +15,7 @@ import (
 
 type command struct {
 	command     *cobra.Command
-	flags       func(cmd *cobra.Command)
+	flags       func(cmd *cobra.Command) error
 	subcommands []command
 }
 
@@ -49,10 +50,16 @@ var (
 				return nil
 			},
 		},
-		flags: func(cmd *cobra.Command) {
-			cmd.PersistentFlags().String("config", "$HOME/.config/dpm/config.yml", "Location of configuration file")
-			cmd.PersistentFlags().StringP("dev-directory", "d", "$HOME/dev", "Where all the dev projects go")
+		flags: func(cmd *cobra.Command) error {
+			home, err := os.UserHomeDir()
+			if err != nil {
+				return err
+			}
+
+			cmd.PersistentFlags().String("config", fmt.Sprintf("%s/.config/dpm/config.yaml", home), "Location of configuration file")
+			cmd.PersistentFlags().StringP("dev-directory", "d", fmt.Sprintf("%s/dev", home), "Where all the dev projects go")
 			cmd.PersistentFlags().BoolP("verbose", "v", false, "Enable more detailed logs")
+			return nil
 		},
 		subcommands: []command{
 			{
@@ -64,7 +71,9 @@ var (
 					Args:    cobra.MatchAll(cobra.ExactArgs(1)),
 					RunE:    cloneCmd,
 				},
-				flags:       func(cmd *cobra.Command) {},
+				flags: func(cmd *cobra.Command) error {
+					return nil
+				},
 				subcommands: []command{},
 			},
 			{
@@ -74,8 +83,9 @@ var (
 					Long:  `Lists all the known git repos`,
 					RunE:  listCmd,
 				},
-				flags: func(cmd *cobra.Command) {
+				flags: func(cmd *cobra.Command) error {
 					cmd.PersistentFlags().BoolP("names", "n", false, "Only return project names")
+					return nil
 				},
 			},
 		},
@@ -111,7 +121,10 @@ func main() {
 func registerCommands(parentCommand *cobra.Command, commands []command) error {
 	for _, cmd := range commands {
 		// Register Flags
-		cmd.flags(cmd.command)
+		err := cmd.flags(cmd.command)
+		if err != nil {
+			return fmt.Errorf("failed to register command flags: %w", err)
+		}
 
 		// Add command as subcommand
 		if parentCommand != nil {
@@ -119,9 +132,9 @@ func registerCommands(parentCommand *cobra.Command, commands []command) error {
 		}
 
 		// Process subcommands
-		err := registerCommands(cmd.command, cmd.subcommands)
+		err = registerCommands(cmd.command, cmd.subcommands)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to register subcommand: %w", err)
 		}
 	}
 
