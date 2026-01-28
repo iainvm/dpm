@@ -1,4 +1,4 @@
-package main
+package logger
 
 import (
 	"log/slog"
@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func newLogger() {
+func NewCLILogger(attrs ...any) {
 	// Default to not logging anything
 	var level slog.Level = 9
 	if viper.GetBool("verbose") {
@@ -23,8 +23,6 @@ func newLogger() {
 		},
 	}))
 
-	logger = logger.With(
-		slog.String("version", version),
-	)
+	logger = logger.With(attrs...)
 	slog.SetDefault(logger)
 }

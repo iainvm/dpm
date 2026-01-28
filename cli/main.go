@@ -7,6 +7,8 @@ import (
 
 	"github.com/charmbracelet/fang"
 	"github.com/spf13/cobra"
+
+	"github.com/iainvm/dpm/internal/logger"
 )
 
 type command struct {
@@ -16,8 +18,10 @@ type command struct {
 }
 
 var (
-	version string = "local"
-	rootCmd        = command{
+	version   string = "local"
+	buildDate string = "unknown"
+
+	rootCmd = command{
 		command: &cobra.Command{
 			Use:   "dpm",
 			Short: "Development Project Manager",
@@ -31,7 +35,13 @@ var (
 				}
 
 				// Setup Logging
-				newLogger()
+				logger.NewCLILogger(
+					slog.Group(
+						"build",
+						slog.String("version", version),
+						slog.String("date", buildDate),
+					),
+				)
 
 				return nil
 			},

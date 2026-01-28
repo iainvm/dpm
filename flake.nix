@@ -12,16 +12,16 @@
   };
 
   outputs = {
+    self,
     nixpkgs,
     flake-utils,
     ...
   }: let
+    version = "0.1.0";
     pkgs = import nixpkgs {system = "x86_64-linux";}; # Specify system type
-
     build_deps = with pkgs; [
       go_1_24
     ];
-
     dev_deps = with pkgs; [
       # Git
       git
@@ -43,10 +43,16 @@
     {
       packages.x86_64-linux.default = pkgs.buildGoModule {
         pname = "dpm";
-        version = "0.1.0";
+        version = version;
         src = ./.;
         vendorHash = "sha256-PeAC4Pf7YksxUJOFpVTxdGnmgEZ/IdazttCg452eEXQ=";
+        # vendorHash = "";
         buildInputs = build_deps;
+        ldflags = [
+          "-s -w"
+          "-X main.version=${version}"
+          "-X main.buildDate=${self.lastModifiedDate}"
+        ];
       };
     }
     // flake-utils.lib.eachDefaultSystem (system: {
