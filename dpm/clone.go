@@ -34,6 +34,7 @@ func Clone(ctx context.Context, devDir string, url string, options *CloneOptions
 			"failed to get repo info",
 			slog.Any("error", err),
 		)
+
 		return "", fmt.Errorf("failed to get repo info: %w", err)
 	}
 
@@ -47,6 +48,7 @@ func Clone(ctx context.Context, devDir string, url string, options *CloneOptions
 			"failed to clone git repo",
 			slog.Any("error", err),
 		)
+
 		return "", fmt.Errorf("failed to clone git repo to '%s': %w", directory, err)
 	}
 

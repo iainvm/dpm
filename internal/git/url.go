@@ -25,6 +25,7 @@ func GetUserFromURL(url string) string {
 
 	// Find matching groups
 	groups := r.FindStringSubmatch(url)
+
 	return groups[2]
 }
 
@@ -32,6 +33,7 @@ func GetUserFromURL(url string) string {
 func IsValidURL(url string) bool {
 	r := regexp.MustCompile(urlRegex)
 	matched := r.MatchString(url)
+
 	return matched
 }
 

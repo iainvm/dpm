@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"log/slog"
 	"os"
 
@@ -20,6 +21,8 @@ type command struct {
 var (
 	version   string = "local"
 	buildDate string = "unknown"
+
+	output io.Writer = os.Stdout
 
 	rootCmd = command{
 		command: &cobra.Command{

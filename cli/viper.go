@@ -28,7 +28,8 @@ func viperSetup(cmd *cobra.Command) error {
 	viper.SetConfigFile(viper.GetString("config"))
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
+	err := viper.ReadInConfig()
+	if err != nil {
 		return err
 	}
 

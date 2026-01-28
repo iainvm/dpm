@@ -7,9 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/iainvm/dpm/dpm"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/iainvm/dpm/dpm"
 )
 
 // cloneCmd parses the CLI args, and calls the dpm.Clone command
@@ -40,7 +41,11 @@ func cloneCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Fprint(os.Stdout, location)
+	_, err = fmt.Fprint(output, location)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -52,5 +57,6 @@ func replaceHome(path string) (string, error) {
 		}
 		path = filepath.Join(homeDir, strings.TrimPrefix(path, "$HOME"))
 	}
+
 	return filepath.Abs(path)
 }

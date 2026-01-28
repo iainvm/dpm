@@ -38,6 +38,7 @@
       gopls
       delve
       gotools
+      golangci-lint
     ];
   in
     {
