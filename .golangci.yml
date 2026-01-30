@@ -1,0 +1,60 @@
+version: "2"
+linters: # https://golangci-lint.run/docs/linters/#all-linters
+  default: none
+  enable:
+    - bodyclose
+    - dogsled
+    - errcheck
+    - gocognit
+    - goconst
+    - gocyclo
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - nilerr
+    - nlreturn
+    - noctx
+    - nolintlint
+    - revive
+    - staticcheck
+    - tparallel
+    - unconvert
+    - unused
+    - whitespace
+  settings:
+    dupl:
+      threshold: 100
+    gocognit:
+      min-complexity: 40
+    goconst:
+      min-len: 2
+      min-occurrences: 3
+    gocritic:
+      disabled-checks:
+        - wrapperFunc
+      enabled-tags:
+        - performance
+        - style
+        - diagnostic
+    gocyclo:
+      min-complexity: 40
+    lll:
+      line-length: 100
+    misspell:
+      locale: UK
+    revive:
+      severity: warning
+      rules:
+        - name: comment-spacings
+          severity: warning
+          disabled: true
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/iainvm

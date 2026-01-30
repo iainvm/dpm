@@ -11,3 +11,13 @@ tasks:
     desc: Build the project
     cmds:
       - nix build
+
+  lint:
+    desc: Lint the project
+    cmds:
+      - golangci-lint run
+
+  fmt:
+    desc: Format the project
+    cmds:
+      - golangci-lint fmt

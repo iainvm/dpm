@@ -1,6 +1,14 @@
 # DPM
 Development project management tool
 
+## Project Layout
+
+```sh
+./dpm       # Implements the actions of dpm
+./cli       # CLI interface to execute dpm actions
+./internal  # Any non-dpm specific code (e.g. library like packages)
+```
+
 
 ## Features
 
