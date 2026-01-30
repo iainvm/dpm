@@ -3,9 +3,6 @@ package main
 import (
 	"fmt"
 	"log/slog"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,10 +24,6 @@ func cloneCmd(cmd *cobra.Command, args []string) error {
 
 	// Parse and replace HOME in dev directory path
 	devDir := viper.GetString("dev-directory")
-	devDir, err := replaceHome(devDir)
-	if err != nil {
-		return err
-	}
 
 	// Options
 	options := &dpm.CloneOptions{}
@@ -47,16 +40,4 @@ func cloneCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
-}
-
-func replaceHome(path string) (string, error) {
-	if strings.HasPrefix(path, "$HOME") {
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			return "", err
-		}
-		path = filepath.Join(homeDir, strings.TrimPrefix(path, "$HOME"))
-	}
-
-	return filepath.Abs(path)
 }
