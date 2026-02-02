@@ -1,16 +1,19 @@
 version: "3"
 silent: true
 
-tasks:
-  test:
-    desc: Test the project
-    cmds:
-      - go test -cover ./...
+vars:
+  CLEAN_UP:
+    - ./result
 
+tasks:
   build:
     desc: Build the project
     cmds:
       - nix build
+  test:
+    desc: Test the project
+    cmds:
+      - go test -cover ./...
 
   lint:
     desc: Lint the project
@@ -21,3 +24,11 @@ tasks:
     desc: Format the project
     cmds:
       - golangci-lint fmt
+
+  clean:
+    desc: Cleans up configured files/folders
+    requires:
+      vars: [CLEAN_UP]
+    cmds:
+      - for: { var: CLEAN_UP, as: FILE }
+        cmd: 'find . -wholename "{{.FILE}}" -print0  | xargs -r -0 -I {} sh -c "echo Removing: \"{}\"; rm -r \"{}\""'

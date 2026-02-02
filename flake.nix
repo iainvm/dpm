@@ -17,6 +17,7 @@
     flake-utils,
     ...
   }: let
+    name = "dpm";
     version = "0.1.0";
     pkgs = import nixpkgs {system = "x86_64-linux";}; # Specify system type
     build_deps = with pkgs; [
@@ -43,11 +44,15 @@
   in
     {
       packages.x86_64-linux.default = pkgs.buildGoModule {
-        pname = "dpm";
+        pname = name;
         version = version;
+        meta = {
+          description = "A CLI to manage development projects";
+        };
+
         src = ./.;
+        subPackages = ["cmd/${name}"];
         vendorHash = "sha256-PeAC4Pf7YksxUJOFpVTxdGnmgEZ/IdazttCg452eEXQ=";
-        # vendorHash = "";
         buildInputs = build_deps;
         ldflags = [
           "-s -w"
